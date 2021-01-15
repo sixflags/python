@@ -25,7 +25,7 @@ declare -A gpgKeys=(
 	# https://www.python.org/dev/peps/pep-0619/#release-manager-and-crew
 )
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(greadlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
@@ -131,11 +131,7 @@ for version in "${versions[@]}"; do
 
 	echo "$version: $fullVersion"
 
-	for v in \
-		alpine{3.11,3.12} \
-		{stretch,buster}{/slim,} \
-		windows/windowsservercore-{1809,ltsc2016} \
-	; do
+	for v in bullseye{/slim,}; do
 		dir="$version/$v"
 		variant="$(basename "$v")"
 
@@ -155,7 +151,7 @@ for version in "${versions[@]}"; do
 
 		{ generated_warning; cat "$template"; } > "$dir/Dockerfile"
 
-		sed -ri \
+		sed -ri '' \
 			-e 's/^(ENV GPG_KEY) .*/\1 '"${gpgKeys[$version]:-${gpgKeys[$rcVersion]}}"'/' \
 			-e 's/^(ENV PYTHON_VERSION) .*/\1 '"$fullVersion"'/' \
 			-e 's/^(ENV PYTHON_RELEASE) .*/\1 '"${fullVersion%%[a-z]*}"'/' \
